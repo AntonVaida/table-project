@@ -1,0 +1,1 @@
+export type FooterTableDataType = {value: string, id: string}

@@ -1,0 +1,1 @@
+export type HeaderTableDataType = {title: string, id: string}
