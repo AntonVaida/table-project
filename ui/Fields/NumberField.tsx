@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Inputs } from "@/components/TableConfigForm/useTableConfigForm";
 
@@ -31,20 +31,6 @@ export const NumberField = ({
   inputStyle,
   placeholder
 }: NumberFieldProps) => {
-
-  console.log("NumberField", {
-    register,
-    name,
-    errors,
-    maxValue,
-    title,
-    required,
-    disabled,
-    containerStyle,
-    labelStyle,
-    inputStyle,
-    placeholder
-  });
 
   return (
     <div className={`${errors?.[name] ? 'mb-6' : ''} ${containerStyle ? containerStyle : ''}`}>

@@ -1,87 +1,108 @@
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useClientContext } from "@/hooks";
-import { Cell } from "@/shared";
-import { TableDataType, BodyTableDataType, FooterTableDataType } from "@/shared";
-import { generateRandomThreeDigitNumber } from "@/utils";
-
-type DataType = {
-  headerData: {title: string, id: string}[];
-  bodyData: {
-    rowId: string,
-    rowTitle: string,
-    rowData: Cell[]
-  }[]
-  footerData: {value: string, id: string}[]
-}
+import { getTableData, updateTableData, getNewRow } from "@/utils";
+import { TableDataType } from "@/shared";
 
 export const useTable = () => {
   const {columnConfig, rowConfig, highlightCount} = useClientContext();
+  const [data, setData] = useState<TableDataType | null>(null);
+  const [hoveredItemId, setHoveredItemId] = useState<number | null>(null);
 
-const generateTableData = ({
-  columns,
-  rows,
-}: {
-  columns: number;
-  rows: number;
-}): TableDataType => {
-  // Ініціалізуємо базову структуру даних
-  const data: TableDataType = {
-    headerData: [],
-    bodyData: [],
-    footerData: [],
-  };
+  useEffect(() => {
+    if (!columnConfig || !rowConfig) return;
 
-  // Генеруємо headerData
-  data.headerData = Array.from({ length: columns + 2 }, (_, indexColumn) => {
-    if (indexColumn === 0) {
-      return { title: "", id: `col:${indexColumn}` };
-    }
-    if (indexColumn === columns + 1) {
-      return { title: "Sum values", id: `col:${indexColumn}` };
-    }
-    return { title: `Cell values N = ${indexColumn}`, id: `col:${indexColumn}` };
-  });
+    const tableData = getTableData({columns: columnConfig, rows: rowConfig});
+    setData(tableData)
+  }, [columnConfig, rowConfig])
 
-  // Масив для підрахунку значень у footerData
-  const footerSums = Array(columns).fill(0);
+  const increaseHandler = useCallback((id: number) => {
+    if (!id) return;
 
-  // Генеруємо bodyData
-  data.bodyData = Array.from({ length: rows }, (_, indexRow) => {
-    const rowId = `row:${indexRow + 1}`;
-    const rowTitle = `Cell Value M = ${indexRow + 1}`;
-    let rowTotalSum = 0;
+    const updatedBodyData = data?.bodyData?.map(row => {
+      return {
+        ...row,
+        rowData: row?.rowData?.map(cell => {
+        if (cell?.id === id) {
+          return {...cell, amount: cell?.amount + 1};
+        }
 
-    const rowData = Array.from({ length: columns + 1 }, (_, indexColumn) => {
-      if (indexColumn === columns) {
-        // Останній стовпець: сума рядка
-        return { id: `${rowId}:col:${indexColumn}`, amount: rowTotalSum };
+        return cell
+      })
       }
+    })
 
-      // Інші стовпці: випадкові значення
-      const amount = generateRandomThreeDigitNumber();
-      rowTotalSum += amount;
+    if (updatedBodyData) {
+      const updatedData = updateTableData({
+        bodyData: updatedBodyData
+      });
 
-      // Оновлюємо підсумки для footerData
-      footerSums[indexColumn] += amount;
+      setData(prevData => {
+        if (!prevData) return null;
 
-      return { id: `${rowId}:col:${indexColumn}`, amount };
+        return {...prevData, ...updatedData}})
+    }
+  }, [data])
+
+  const removeRowHandler = useCallback((rowId: string) => {
+    if (!rowId) return;
+
+    const updatedBodyData = data?.bodyData?.filter(row => row?.rowId !== rowId);
+
+    if (updatedBodyData) {
+      const updatedData = updateTableData({
+        bodyData: updatedBodyData
+      });
+
+      setData(prevData => {
+        if (!prevData) return null;
+
+        return {...prevData, ...updatedData}})
+    }
+  }, [data])
+
+  const addRowHandler = useCallback(() => {
+    if (!data) return;
+
+    const newRow = getNewRow({data})
+
+    const updatedBodyData = [...data.bodyData, newRow];
+
+    const updatedData = updateTableData({
+      bodyData: updatedBodyData
     });
 
-    return { rowId, rowTitle, rowData };
-  });
+    setData(prevData => {
+      if (!prevData) return null;
 
-  // Генеруємо footerData
-  data.footerData = [
-    { id: "footer:label", value: "50th percentile" },
-    ...footerSums.map((sum, indexColumn) => ({
-      id: `footer:col:${indexColumn + 1}`,
-      value: (sum / rows).toFixed(2), // Середнє значення у стовпці
-    })),
-    { id: `footer:col:${columns}`, value: "" }, // Пустий останній стовпець
-  ];
+      return {...prevData, ...updatedData}
+    })
+  }, [data])
 
-  return data;
-};
-  const data = columnConfig && rowConfig ? generateTableData({columns: columnConfig, rows: rowConfig}) : null;
+  const highlightIdList = useMemo(() => {
+    if (!hoveredItemId || !highlightCount) return [];
+    const cellList = data?.bodyData?.map(row => row?.rowData?.map(cell => cell)).flat();
+    const hoveredCell = cellList?.find(cell => cell?.id === hoveredItemId);
 
-  console.log("DATAAA", data)
+    if (!hoveredCell || !cellList?.length) return [];
+
+    if (Number(`${hoveredItemId}`?.slice(-1)) === columnConfig) {
+      const rowId = `${hoveredItemId}`?.slice(0, 1);
+      return cellList?.filter(cell => `${cell?.id}`?.slice(0, 1) === rowId)?.map(cell => cell?.id);
+    }
+
+    return cellList
+    .sort((cellA, cellB) => Math.abs(cellA?.amount - hoveredCell?.amount) - Math.abs(cellB.amount - hoveredCell?.amount))
+    .slice(0, highlightCount)?.map(cell => cell?.id);
+
+  }, [highlightCount, hoveredItemId, data])
+
+
+  return {
+    data,
+    increaseHandler,
+    removeRowHandler,
+    addRowHandler,
+    highlightIdList,
+    setHoveredItemId
+  }
 }

@@ -1,4 +1,3 @@
-"use client";
 import { NumberFieldProps, NumberField } from "../Fields/NumberField";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Inputs } from "@/components/TableConfigForm/useTableConfigForm";
