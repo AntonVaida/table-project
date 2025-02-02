@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+
+import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useClientContext } from "@/hooks";
 import { useRouter } from "next/navigation";
@@ -14,9 +15,9 @@ export type Inputs = {
 
 export const useTableConfigForm = () => {
   const {
-    setColumnConfig, 
-    setRowConfig, 
-    setHighlightCount,
+    handleSetColumnConfig, 
+    handleSetRowConfig, 
+    handleSetHighlightCount,
     columnConfig: defaultColumnConfig,
     rowConfig: defaultRowConfig,
     highlightCount
@@ -26,32 +27,40 @@ export const useTableConfigForm = () => {
     register,
     handleSubmit,
     watch,
+    reset,
+    setValue,
     formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      columnConfig: defaultColumnConfig,
-      rowConfig: defaultRowConfig,
-      highlightCount: highlightCount
-    }
-  });
+  } = useForm<Inputs>();
 
   const router = useRouter();
   const columnConfig = watch('columnConfig');
   const rowConfig = watch('rowConfig');
 
+  useEffect(() => {
+    reset({
+      columnConfig: defaultColumnConfig,
+      rowConfig: defaultRowConfig,
+      highlightCount: highlightCount,
+    });
+  }, [defaultColumnConfig, defaultRowConfig, highlightCount, reset]);
+
   const onSubmitHandler = handleSubmit((data) => {
     const {columnConfig, rowConfig, highlightCount} = data;
 
     if (highlightCount && rowConfig && columnConfig) {
-      setColumnConfig(Number(columnConfig));
-      setRowConfig(Number(rowConfig));
-      setHighlightCount(Number(highlightCount));
+      handleSetColumnConfig(Number(columnConfig));
+      handleSetRowConfig(Number(rowConfig));
+      handleSetHighlightCount(Number(highlightCount));
 
       router.push('table')
     }
   });
 
  const maxHighlightCount = useMemo(() => {
+    if(columnConfig !== defaultColumnConfig || rowConfig !== defaultRowConfig) {
+      setValue('highlightCount', null);
+    }
+
     if (columnConfig && rowConfig) {
       return Number(columnConfig) * Number(rowConfig);
     } 
