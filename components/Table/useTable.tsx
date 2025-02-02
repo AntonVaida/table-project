@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { useClientContext } from "@/hooks";
-import { getTableData, updateTableData, getNewRow } from "@/utils";
+import { getTableData, updateTableData, getDataWithNewRow, SPLIT_CELL_ID_PATTERN } from "@/utils";
 import { TableDataType } from "@/shared";
 
 export const useTable = () => {
@@ -63,9 +63,7 @@ export const useTable = () => {
   const addRowHandler = useCallback(() => {
     if (!data) return;
 
-    const newRow = getNewRow({data})
-
-    const updatedBodyData = [...data.bodyData, newRow];
+    const updatedBodyData = getDataWithNewRow({data})
 
     const updatedData = updateTableData({
       bodyData: updatedBodyData
@@ -85,9 +83,10 @@ export const useTable = () => {
 
     if (!hoveredCell || !cellList?.length) return [];
 
-    if (Number(`${hoveredItemId}`?.slice(-1)) === columnConfig) {
-      const rowId = `${hoveredItemId}`?.slice(0, 1);
-      return cellList?.filter(cell => `${cell?.id}`?.slice(0, 1) === rowId)?.map(cell => cell?.id);
+    console.log('hoveredItemId', {hoveredItemId, boolean: `${hoveredItemId}`?.split(`${SPLIT_CELL_ID_PATTERN}`)?.[1] === `${columnConfig}`, columnConfig, chek: `${hoveredItemId}`?.split(`${SPLIT_CELL_ID_PATTERN}`)?.[1]})
+    if (`${hoveredItemId}`?.split(`${SPLIT_CELL_ID_PATTERN}`)?.[1] === `${columnConfig}`) {
+      const rowId = `${hoveredItemId}`?.split(`${SPLIT_CELL_ID_PATTERN}`)?.[0];
+      return cellList?.filter(cell => `${cell?.id}`?.split(`${SPLIT_CELL_ID_PATTERN}`)?.[0] === rowId)?.map(cell => cell?.id);
     }
 
     return cellList

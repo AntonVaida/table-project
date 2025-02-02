@@ -1,4 +1,4 @@
-
+"use client";
 import { useTable } from "./useTable"
 import { TableHeaderCell } from "../TableHeaderCell"
 import { TableDataRow } from "../TableDataRow";
@@ -16,9 +16,9 @@ const {
 
 
   return (
-    <div className="min-h-[100vh] overflow-x-auto flex justify-center items-center bg-white p-12">
-      <div className="border-solid border-[2px] border-slateBlue rounded-xl overflow-hidden bg-slateBlue">
-      <table>
+    <div className="min-h-[100vh] w-full bg-white p-4 md:p-12 flex justify-center items-center">
+      <div className="border-solid border-[2px] border-slateBlue bg-slateBlue rounded-xl overflow-x-auto custom-scroll">
+      <table className="">
         <thead>
           <tr>
             {data?.headerData?.map(headerData => (

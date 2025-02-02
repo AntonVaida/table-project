@@ -1,4 +1,5 @@
 import { TableDataType } from "@/shared";
+import { SPLIT_CELL_ID_PATTERN } from "./getTableData";
 
 export const updateTableData = ({
   bodyData,
@@ -8,21 +9,20 @@ export const updateTableData = ({
   const columns = bodyData?.[0]?.rowData?.length - 1;
   const rows = bodyData?.length;
 
-  console.log("COLUMNS", {columns, rows})
   const footerSums = Array(columns).fill(0);
 
-  const updatedBodyData = bodyData.map((row) => {
+  const updatedBodyData = bodyData.map((row, indexRow) => {
     let rowTotalSum = 0;
 
     const updatedRowData = row.rowData.map((cell, indexColumn) => {
       if (indexColumn === columns) {
-        return { ...cell, amount: rowTotalSum };
+        return { ...cell, amount: rowTotalSum, id: Number(`${indexRow + 1}${SPLIT_CELL_ID_PATTERN}${indexColumn}`) };
       }
 
       rowTotalSum += cell.amount;
       footerSums[indexColumn] += cell.amount;
 
-      return cell;
+      return {...cell, id: Number(`${indexRow + 1}${SPLIT_CELL_ID_PATTERN}${indexColumn}`)};
     });
 
     return { ...row, rowData: updatedRowData };

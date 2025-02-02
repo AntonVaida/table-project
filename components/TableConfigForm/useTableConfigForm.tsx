@@ -28,6 +28,7 @@ export const useTableConfigForm = () => {
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>();
 
@@ -56,6 +57,10 @@ export const useTableConfigForm = () => {
   });
 
  const maxHighlightCount = useMemo(() => {
+    if(columnConfig !== defaultColumnConfig || rowConfig !== defaultRowConfig) {
+      setValue('highlightCount', null);
+    }
+
     if (columnConfig && rowConfig) {
       return Number(columnConfig) * Number(rowConfig);
     } 

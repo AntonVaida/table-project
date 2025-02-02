@@ -1,6 +1,8 @@
 import { TableDataType } from "@/shared";
 import { getRandomThreeDigitNumber } from "./getRandomThreeDigitNumber";
 
+export const SPLIT_CELL_ID_PATTERN = 987654321;
+
 export const getTableData = ({
   columns,
   rows,
@@ -33,7 +35,7 @@ export const getTableData = ({
 
     const rowData = Array.from({ length: columns + 1 }, (_, indexColumn) => {
       if (indexColumn === columns) {
-        return { id: Number(`${indexRow + 1}${indexColumn}`), amount: rowTotalSum };
+        return { id: Number(`${indexRow + 1}${SPLIT_CELL_ID_PATTERN}${indexColumn}`), amount: rowTotalSum };
       }
 
       const amount = getRandomThreeDigitNumber();
@@ -41,7 +43,7 @@ export const getTableData = ({
 
       footerSums[indexColumn] += amount;
 
-      return { id: Number(`${indexRow + 1}${indexColumn}`), amount };
+      return { id: Number(`${indexRow + 1}${SPLIT_CELL_ID_PATTERN}${indexColumn}`), amount };
     });
 
     return { rowId, rowTitle, rowData };
