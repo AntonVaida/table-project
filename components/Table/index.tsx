@@ -35,6 +35,7 @@ const {
               removeRowHandler={removeRowHandler}
               highlightIdList={highlightIdList}
               setHoveredItemId={setHoveredItemId}
+              disabledRemoveButton={data?.bodyData?.length === 1}
             />
           ))}
         </tbody> 

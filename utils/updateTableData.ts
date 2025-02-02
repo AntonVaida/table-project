@@ -25,7 +25,7 @@ export const updateTableData = ({
       return {...cell, id: Number(`${indexRow + 1}${SPLIT_CELL_ID_PATTERN}${indexColumn}`)};
     });
 
-    return { ...row, rowData: updatedRowData };
+    return { ...row, rowData: updatedRowData, rowId: `row:${indexRow + 1}` };
   });
 
   const updatedFooterData = [
