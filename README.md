@@ -10,4 +10,4 @@ A table application built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Live Demo
 
-Check out the live demo: [Table Project](https://table-project-6x8zel1du-antonvaidas-projects.vercel.app/)
+Check out the live demo: [Table Project](table-project-swart.vercel.app)
