@@ -10,14 +10,15 @@ export const TableDataRow = ({
   increaseHandler,
   removeRowHandler,
   highlightIdList,
-  setHoveredItemId
+  setHoveredItemId,
+  disabledRemoveButton
 }: {
   row: BodyTableDataType, 
   increaseHandler: (id: number) => void,
   removeRowHandler: (rowId: string) => void,
   highlightIdList: number[],
   setHoveredItemId: Dispatch<SetStateAction<number | null>>
-
+  disabledRemoveButton: boolean
 }) => {
   const {
     hoveredSumValue,
@@ -53,7 +54,7 @@ export const TableDataRow = ({
         }
       })}
       <td className="pr-4">
-        <IconButton icon={<RemoveIcon height={20} width={20} />} onClick={() => removeRowHandler(row?.rowId)} />
+        <IconButton disabled={disabledRemoveButton} icon={<RemoveIcon height={20} width={20} />} onClick={() => removeRowHandler(row?.rowId)} />
       </td>
     </tr>
   )
